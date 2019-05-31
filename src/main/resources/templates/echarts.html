@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>spark_static</title>
+    <!-- 引入 ECharts 文件 -->
+    <script src="js/echarts.min.js"></script>
+
+    <!--    引入Jquery文件  动态获取数据-->
+    <script src="js/jquery.js"></script>
+</head>
+<body>
+
+<body>
+<!--这是通过/echarts请求跳转的页面-->
+
+
+<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+<div id="main" style="width: 600px;height:400px;position: absolute;top: 50%;left: 50%;margin-top: -200px;margin-left: -300px"></div>
+
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 指定图表的配置项和数据
+    var option = {
+        title : {
+            text: '课程实时流处理访问统计',
+            subtext: '课程访问次数',
+            x:'center'
+        },
+        tooltip : {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            //列表，如果太多可以不要
+            data: ['Spark SQL项目实战','Hadoop入门','Spark Streaming项目实战','大数据面试题','Storm实战']
+        },
+        series : [
+            {
+                name: '访问次数',
+                type: 'pie',
+                radius : '55%',
+                center: ['50%', '60%'],
+                //这个data是一个数据,是通过ajax动态刷新
+                data:(function () {  //<![CDATA[
+                    var datas = [];
+                    $.ajax({
+                        type:"POST",
+                        // url:"/testspark/echarts",
+                        url:"/testspark/courseClickCount_dynamic",
+                        dataType:'json',
+                        async: false,//同步或者异步，这里选择同步
+                        success:function (result) {
+                            for (var i =0;i<result.length;i++){
+                                datas.push({"value":result[i].value,"name":result[i].name})
+                            }
+                        }
+                    })
+                    return datas;
+                    //]]>
+                })(),
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+
+
+
+
+
+</body>
+
+</body>
+</html>
